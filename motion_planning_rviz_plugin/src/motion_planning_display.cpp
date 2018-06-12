@@ -34,6 +34,8 @@
 
 /* Author: Ioan Sucan, Dave Coleman, Adam Leeper, Sachin Chitta */
 
+#include <boost/signals2/mutex.hpp>
+
 #include <moveit/motion_planning_rviz_plugin/motion_planning_display.h>
 #include <moveit/rviz_plugin_render_tools/planning_link_updater.h>
 #include <moveit/rviz_plugin_render_tools/robot_state_visualization.h>
@@ -486,7 +488,7 @@ void MotionPlanningDisplay::computeMetrics(bool start, const std::string& group,
       robot_interaction_->getActiveEndEffectors();
   if (eef.empty())
     return;
-  boost::mutex::scoped_lock slock(update_metrics_lock_);
+  boost::interprocess::scoped_lock<boost::signals2::mutex> slock(update_metrics_lock_);
 
   robot_state::RobotStateConstPtr state = start ? getQueryStartState() : getQueryGoalState();
   for (std::size_t i = 0; i < eef.size(); ++i)

@@ -34,6 +34,9 @@
 
 /* Author: Dave Coleman */
 
+#include <boost/interprocess/sync/scoped_lock.hpp>
+#include <boost/signals2/mutex.hpp>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
@@ -365,7 +368,7 @@ void TrajectoryVisualization::update(float wall_dt, float ros_dt)
   }
   if (!animating_path_)
   {  // finished last animation?
-    boost::mutex::scoped_lock lock(update_trajectory_message_);
+    boost::interprocess::scoped_lock<boost::signals2::mutex> lock(update_trajectory_message_);
 
     // new trajectory available to display?
     if (trajectory_message_to_display_ && !trajectory_message_to_display_->empty())
@@ -487,7 +490,7 @@ void TrajectoryVisualization::incomingDisplayTrajectory(const moveit_msgs::Displ
 
   if (!t->empty())
   {
-    boost::mutex::scoped_lock lock(update_trajectory_message_);
+    boost::interprocess::scoped_lock<boost::signals2::mutex> lock(update_trajectory_message_);
     trajectory_message_to_display_.swap(t);
     if (interrupt_display_property_->getBool())
       interruptCurrentDisplay();

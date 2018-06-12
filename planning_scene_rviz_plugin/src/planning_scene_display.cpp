@@ -35,6 +35,7 @@
 
 /* Author: Ioan Sucan */
 
+#include <boost/interprocess/sync/scoped_lock.hpp>
 #include <moveit/planning_scene_rviz_plugin/planning_scene_display.h>
 #include <moveit/rviz_plugin_render_tools/robot_state_visualization.h>
 #include <moveit/rviz_plugin_render_tools/octomap_render.h>
@@ -171,7 +172,7 @@ void PlanningSceneDisplay::clearJobs()
 {
   background_process_.clear();
   {
-    boost::unique_lock<boost::mutex> ulock(main_loop_jobs_lock_);
+    boost::unique_lock<boost::signals2::mutex> ulock(main_loop_jobs_lock_);
     main_loop_jobs_.clear();
   }
 }
@@ -224,13 +225,13 @@ void PlanningSceneDisplay::spawnBackgroundJob(const boost::function<void()>& job
 
 void PlanningSceneDisplay::addMainLoopJob(const boost::function<void()>& job)
 {
-  boost::unique_lock<boost::mutex> ulock(main_loop_jobs_lock_);
+  boost::unique_lock<boost::signals2::mutex> ulock(main_loop_jobs_lock_);
   main_loop_jobs_.push_back(job);
 }
 
 void PlanningSceneDisplay::waitForAllMainLoopJobs()
 {
-  boost::unique_lock<boost::mutex> ulock(main_loop_jobs_lock_);
+  boost::unique_lock<boost::signals2::mutex> ulock(main_loop_jobs_lock_);
   while (!main_loop_jobs_.empty())
     main_loop_jobs_empty_condition_.wait(ulock);
 }
@@ -501,7 +502,7 @@ void PlanningSceneDisplay::clearRobotModel()
 void PlanningSceneDisplay::loadRobotModel()
 {
   // wait for other robot loadRobotModel() calls to complete;
-  boost::mutex::scoped_lock _(robot_model_loading_lock_);
+  boost::interprocess::scoped_lock<boost::signals2::mutex> _(robot_model_loading_lock_);
   model_is_loading_ = true;
 
   // we need to make sure the clearing of the robot model is in the main thread,

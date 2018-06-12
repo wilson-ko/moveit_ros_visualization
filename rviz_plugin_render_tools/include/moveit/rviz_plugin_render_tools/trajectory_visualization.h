@@ -37,6 +37,8 @@
 #ifndef MOVEIT_TRAJECTORY_RVIZ_PLUGIN__TRAJECTORY_VISUALIZATION
 #define MOVEIT_TRAJECTORY_RVIZ_PLUGIN__TRAJECTORY_VISUALIZATION
 
+#include <boost/signals2/mutex.hpp>
+
 #include <moveit/macros/class_forward.h>
 #include <rviz/display.h>
 #include <rviz/panel_dock_widget.h>
@@ -139,7 +141,7 @@ protected:
   bool drop_displaying_trajectory_;
   int current_state_;
   float current_state_time_;
-  boost::mutex update_trajectory_message_;
+  boost::signals2::mutex update_trajectory_message_;
 
   robot_model::RobotModelConstPtr robot_model_;
   robot_state::RobotStatePtr robot_state_;

@@ -37,6 +37,9 @@
 #ifndef MOVEIT_VISUALIZATION_SCENE_DISPLAY_RVIZ_PLUGIN_SCENE_DISPLAY_
 #define MOVEIT_VISUALIZATION_SCENE_DISPLAY_RVIZ_PLUGIN_SCENE_DISPLAY_
 
+#include <boost/fiber/condition_variable.hpp>
+#include <boost/signals2/mutex.hpp>
+
 #include <rviz/display.h>
 
 #ifndef Q_MOC_RUN
@@ -175,12 +178,12 @@ protected:
 
   planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
   bool model_is_loading_;
-  boost::mutex robot_model_loading_lock_;
+  boost::signals2::mutex robot_model_loading_lock_;
 
   moveit::tools::BackgroundProcessing background_process_;
   std::deque<boost::function<void()> > main_loop_jobs_;
-  boost::mutex main_loop_jobs_lock_;
-  boost::condition_variable main_loop_jobs_empty_condition_;
+  boost::signals2::mutex main_loop_jobs_lock_;
+  boost::fibers::condition_variable_any main_loop_jobs_empty_condition_;
 
   Ogre::SceneNode* planning_scene_node_;  ///< displays planning scene with everything in it
 

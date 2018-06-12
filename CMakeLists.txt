@@ -10,7 +10,7 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-find_package(Boost REQUIRED thread date_time system filesystem)
+find_package(Boost REQUIRED thread date_time system filesystem fiber)
 
 find_package(PkgConfig REQUIRED)
 
